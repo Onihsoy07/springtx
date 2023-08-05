@@ -15,3 +15,5 @@ logging:
         #JPA log
         resource:
           transaction: DEBUG
+        #JPA SQL
+        SQL: DEBUG
