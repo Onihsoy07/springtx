@@ -49,4 +49,39 @@ public class BasicTxTest {
         log.info("트랜잭션 롤백 완료");
     }
 
+    @Test
+    void doubleCommit() {
+        log.info("트랜잭션1 시작");
+        TransactionStatus status1 = tm.getTransaction(new DefaultTransactionAttribute());
+
+        log.info("트랜잭션1 커밋 시작");
+        tm.commit(status1);
+        log.info("트랜잭션1 커밋 완료");
+
+        log.info("트랜잭션2 시작");
+        TransactionStatus status2 = tm.getTransaction(new DefaultTransactionAttribute());
+
+        log.info("트랜잭션2 커밋 시작");
+        tm.commit(status2);
+        log.info("트랜잭션2 커밋 완료");
+    }
+
+    @Test
+    void commit_rollback() {
+        log.info("트랜잭션1 시작");
+        TransactionStatus status1 = tm.getTransaction(new DefaultTransactionAttribute());
+
+        log.info("트랜잭션1 커밋 시작");
+        tm.commit(status1);
+        log.info("트랜잭션1 커밋 완료");
+
+        log.info("트랜잭션2 시작");
+        TransactionStatus status2 = tm.getTransaction(new DefaultTransactionAttribute());
+
+        log.info("트랜잭션2 롤백 시작");
+        tm.rollback(status2);
+        log.info("트랜잭션2 롤백 완료");
+    }
+
+
 }
