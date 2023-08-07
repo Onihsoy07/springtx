@@ -102,5 +102,23 @@ public class BasicTxTest {
         log.info("외부 트랜잭션 커밋 완료");
     }
 
+    @Test
+    void outerRollback() {
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = tm.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.insNewTransaction()={}", outer.isNewTransaction());
+
+        log.info("내부 트랜잭션 시작");
+        TransactionStatus inner = tm.getTransaction(new DefaultTransactionAttribute());
+        log.info("inner.insNewTransaction()={}", inner.isNewTransaction());
+
+        log.info("내부 트랜잭션 커밋 시작");
+        tm.commit(inner);
+        log.info("내부 트랜잭션 커밋 완료");
+
+        log.info("외부 트랜잭션 롤백 시작");
+        tm.rollback(outer);
+        log.info("외부 트랜잭션 롤백 완료");
+    }
 
 }
