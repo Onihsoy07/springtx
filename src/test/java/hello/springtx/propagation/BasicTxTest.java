@@ -1,6 +1,7 @@
 package hello.springtx.propagation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,9 +10,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 import javax.sql.DataSource;
+
+import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
@@ -119,6 +123,26 @@ public class BasicTxTest {
         log.info("외부 트랜잭션 롤백 시작");
         tm.rollback(outer);
         log.info("외부 트랜잭션 롤백 완료");
+    }
+
+    @Test
+    void innerRollback() {
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = tm.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.insNewTransaction()={}", outer.isNewTransaction());
+
+        log.info("내부 트랜잭션 시작");
+        TransactionStatus inner = tm.getTransaction(new DefaultTransactionAttribute());
+        log.info("inner.insNewTransaction()={}", inner.isNewTransaction());
+
+        log.info("내부 트랜잭션 롤백 시작");
+        tm.rollback(inner); //rollback-only 마킹
+        log.info("내부 트랜잭션 롤백 완료");
+
+        log.info("외부 트랜잭션 커밋 시작");
+        assertThatThrownBy(() -> tm.commit(outer))
+                .isInstanceOf(UnexpectedRollbackException.class);
+        log.info("외부 트랜잭션 커밋 완료");
     }
 
 }
