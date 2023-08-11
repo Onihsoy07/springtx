@@ -20,6 +20,11 @@ class MemberServiceTest {
     @Autowired
     MemberService memberService;
 
+    /**
+     * memberService       @Transaction : OFF
+     * memberRepository    @Transaction : ON
+     * logRepository       @Transaction : ON
+     */
     @Test
     void joinV1() {
         //given
@@ -33,7 +38,13 @@ class MemberServiceTest {
         assertTrue(logRepository.findById(username).isPresent());
     }
 
-    //member 저장, log 에러로 롤백(문제 됨)
+    /**
+     * memberService       @Transaction : OFF
+     * memberRepository    @Transaction : ON
+     * logRepository       @Transaction : ON(Exception)
+     *
+     * member 저장, log 에러로 롤백(문제 됨)
+     */
     @Test
     void outerTxOFF_fail() {
         //given
@@ -47,4 +58,23 @@ class MemberServiceTest {
         assertTrue(memberRepository.findById(username).isPresent());
         assertTrue(logRepository.findById(username).isEmpty());
     }
+
+    /**
+     * memberService       @Transaction : ON
+     * memberRepository    @Transaction : OFF
+     * logRepository       @Transaction : OFF
+     */
+    @Test
+    void singleTx() {
+        //given
+        String username = "outerTxOff_success";
+
+        //when
+        memberService.joinV1(username);
+
+        //then
+        assertTrue(memberRepository.findById(username).isPresent());
+        assertTrue(logRepository.findById(username).isPresent());
+    }
+
 }

@@ -12,7 +12,7 @@ import java.util.Optional;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-@Transactional
+//@Transactional
 public class MemberRepository {
 
     private final EntityManager em;
