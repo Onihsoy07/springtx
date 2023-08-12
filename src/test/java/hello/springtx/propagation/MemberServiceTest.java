@@ -95,4 +95,25 @@ class MemberServiceTest {
         assertTrue(logRepository.findById(username).isPresent());
     }
 
+    /**
+     * memberService       @Transaction : ON
+     * memberRepository    @Transaction : ON
+     * logRepository       @Transaction : ON(Exception)
+     *
+     * member 저장, log 에러로 롤백(문제 됨)
+     */
+    @Test
+    void outerTxOn_fail() {
+        //given
+        String username = "로그예외_outerTxOn_fail";
+
+        //when
+        assertThatThrownBy(() -> memberService.joinV1(username))
+                .isInstanceOf(RuntimeException.class);
+
+        //then
+        assertTrue(memberRepository.findById(username).isEmpty());
+        assertTrue(logRepository.findById(username).isEmpty());
+    }
+
 }
