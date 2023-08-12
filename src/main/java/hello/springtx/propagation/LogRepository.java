@@ -11,7 +11,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Repository
-//@Transactional
+@Transactional
 public class LogRepository {
 
     private final EntityManager em;
