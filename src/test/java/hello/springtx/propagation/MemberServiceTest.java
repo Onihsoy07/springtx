@@ -128,7 +128,7 @@ class MemberServiceTest {
     @Test
     void recoverException_fail() {
         //given
-        String username = "로그예외-recoverException_fail";
+        String username = "로그예외_recoverException_fail";
 
         //when
         assertThatThrownBy(() -> memberService.joinV2(username))
@@ -136,6 +136,24 @@ class MemberServiceTest {
 
         //then
         assertTrue(memberRepository.findById(username).isEmpty());
+        assertTrue(logRepository.findById(username).isEmpty());
+    }
+
+    /**
+     * memberService       @Transaction : ON
+     * memberRepository    @Transaction : ON
+     * logRepository       @Transaction : ON(REQUIRES_NEW, Exception)
+     */
+    @Test
+    void recoverException_success() {
+        //given
+        String username = "로그예외_recoverException_success";
+
+        //when
+        memberService.joinV2(username);
+
+        //then
+        assertTrue(memberRepository.findById(username).isPresent());
         assertTrue(logRepository.findById(username).isEmpty());
     }
 
