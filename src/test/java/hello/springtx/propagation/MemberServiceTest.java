@@ -20,6 +20,8 @@ class MemberServiceTest {
     LogRepository logRepository;
     @Autowired
     MemberService memberService;
+    @Autowired
+    MemberFacade memberFacade;
 
     /**
      * memberService       @Transaction : OFF
@@ -151,6 +153,29 @@ class MemberServiceTest {
 
         //when
         memberService.joinV2(username);
+
+        //then
+        assertTrue(memberRepository.findById(username).isPresent());
+        assertTrue(logRepository.findById(username).isEmpty());
+    }
+
+    /**
+     * memberService       @Transaction : ON
+     * memberRepository    @Transaction : ON
+     * logRepository       @Transaction : ON(Exception)
+     *
+     * memberFacade -> memberService -> memberRepository
+     *              -> logRepository
+     *  
+     * REQUIRES_NEW 없이 구현(데이터베이스 커넥션 1개만 잡고 있음) 상황 따라 선택
+     */
+    @Test
+    void memberFacade_success() {
+        //given
+        String username = "로그예외_memberFacade_success";
+
+        //when
+        memberFacade.LogExceptionSeparation(username);
 
         //then
         assertTrue(memberRepository.findById(username).isPresent());
